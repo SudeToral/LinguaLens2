@@ -1,75 +1,61 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+// app/(tabs)/index.tsx
+import { Entypo } from "@expo/vector-icons";
+import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import React, { useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function Index() {
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [permission, requestPermission] = useCameraPermissions();
 
-export default function HomeScreen() {
+  // calculate a square that's 90% of screen width
+  const screenWidth = Dimensions.get("window").width;
+  const squareSize = screenWidth * 0.9;
+
+  // wait for the permission API
+  if (!permission) return null;
+  if (!permission.granted) {
+    return (
+      <View className="flex-1 bg-white justify-center items-center p-4">
+        <Text className="mb-4 text-gray-700 text-center">
+          We need your permission to show the camera
+        </Text>
+        <TouchableOpacity
+          onPress={requestPermission}
+          className="bg-blue-500 px-4 py-2 rounded"
+        >
+          <Text className="text-white">Grant Permission</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // flip camera front/back
+  const toggleCameraFacing = () =>
+    setFacing((f) => (f === "back" ? "front" : "back"));
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View className="flex-1 bg-white items-center justify-center">
+      {/* camera preview container */}
+      <View
+        className="rounded-lg overflow-hidden border-2 border-gray-400 border-dashed"
+        style={{ width: squareSize, height: squareSize }}
+      >
+        <CameraView style={{ flex: 1 }} facing={facing}>
+          {/* flip button in bottom corner */}
+          <View className="absolute bottom-4 right-4">
+            <TouchableOpacity
+              onPress={toggleCameraFacing}
+              className="bg-black bg-opacity-50 p-3 rounded-full"
+            >
+              <Entypo name="cycle" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </CameraView>
+      </View>
+
+      {/* instruction text */}
+      <Text className="mt-4 text-gray-500">point your camera</Text>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});

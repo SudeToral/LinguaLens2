@@ -65,18 +65,20 @@ export default function Index() {
       </View>
 
       {/* Flip & Create Button */}
-      <View className="h-20 flex-row items-center justify-center">
-        <TouchableOpacity
-          onPress={toggleCameraFacing}
-          className="bg-black bg-opacity-50 p-3 rounded-full mr-4"
-        >
-          <Entypo name="cycle" size={24} color="#fff" />
-        </TouchableOpacity>
+      {/* Flip & Create Button */}
+      <View className="flex-row items-center justify-center mt-5 relative w-full">
+        {/* Centered Capture Button */}
         <TouchableOpacity
           onPress={grabPicture}
-          className="bg-blue-600 px-4 py-2 rounded-md"
+          className="bg-blue-600 p-10 rounded-full"
+        />
+
+        {/* Flip Button Positioned to Right */}
+        <TouchableOpacity
+          onPress={toggleCameraFacing}
+          className="absolute right-10 bg-black bg-opacity-50 p-3 rounded-full"
         >
-          <Text className="text-white font-semibold">Create Flashcard</Text>
+          <Entypo name="cycle" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 

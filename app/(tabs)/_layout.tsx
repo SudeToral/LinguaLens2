@@ -1,27 +1,26 @@
-// app/(tabs)/_layout.tsx
+import { MaterialIcons } from '@expo/vector-icons';
+import { Link, Tabs } from 'expo-router';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ProfileProvider } from '../../context/ProfileContext';
+import { DropdownMenu } from '../Components/DropDownMenu';
+import { MenuOption } from '../Components/MenuOption';
 
-import { MaterialIcons } from "@expo/vector-icons";
-import { Link, Tabs } from "expo-router";
-import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ProfileProvider } from "../../context/ProfileContext";
-import { DropdownMenu } from "../Components/DropDownMenu";
-import { MenuOption } from "../Components/MenuOption";
-
-
+// Settings button in header
 export function SettingsButton() {
   return (
     <Link href="/settings" asChild>
-      <TouchableOpacity className="mx-5">
+      <TouchableOpacity style={styles.settingsButton}>
         <MaterialIcons name="settings" size={24} color="#fff" />
       </TouchableOpacity>
     </Link>
   );
 }
 
+// Tabs layout wrapping flashcards, camera (index) and profile screens
 export default function TabsLayout() {
   const [visible, setVisible] = useState(false);
-  const [language, setLanguage] = useState("english");
+  const [language, setLanguage] = useState('english');
 
   return (
     <ProfileProvider>
@@ -29,41 +28,35 @@ export default function TabsLayout() {
         screenOptions={{
           tabBarShowLabel: false,
           tabBarItemStyle: {
-            width: "100%",
-            height: "100%",
-            justifyContent: "center",
-            alignItems: "center",
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
           },
           tabBarStyle: {
-            backgroundColor: "#0F0D23",
-            borderRadius: 0,
-            marginHorizontal: 0,
-            marginBottom: 0,
+            backgroundColor: '#0F0D23',
             height: 80,
-            position: "absolute",
-            overflow: "hidden",
-            borderWidth: 1,
-            borderColor: "#0F0D23",
+            position: 'absolute',
+            borderTopWidth: 1,
+            borderColor: '#0F0D23',
           },
-          headerStyle: { backgroundColor: "#0F0D23" },
+          headerStyle: { backgroundColor: '#0F0D23' },
           headerLeft: () => <SettingsButton />,
           headerRight: () => (
-            <View style={styles.container}>
+            <View style={styles.headerRightContainer}>
               <DropdownMenu
                 visible={visible}
                 handleOpen={() => setVisible(true)}
                 handleClose={() => setVisible(false)}
                 trigger={
-                  <View className="h-10 bg-white flex-row justify-items-center align-text-bottom w-20 px-1 py-1 mr-5">
-                    <Text className="font-semibold from-neutral-50">
-                      {language}
-                    </Text>
+                  <View style={styles.languageTrigger}>
+                    <Text style={styles.languageText}>{language}</Text>
                   </View>
                 }
               >
                 <MenuOption
                   onSelect={() => {
-                    setLanguage("spanish");
+                    setLanguage('spanish');
                     setVisible(false);
                   }}
                 >
@@ -71,7 +64,7 @@ export default function TabsLayout() {
                 </MenuOption>
                 <MenuOption
                   onSelect={() => {
-                    setLanguage("turkish");
+                    setLanguage('turkish');
                     setVisible(false);
                   }}
                 >
@@ -79,7 +72,7 @@ export default function TabsLayout() {
                 </MenuOption>
                 <MenuOption
                   onSelect={() => {
-                    setLanguage("english");
+                    setLanguage('english');
                     setVisible(false);
                   }}
                 >
@@ -93,44 +86,49 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="flashcards"
           options={{
-            title: "flashcards",
+            title: 'Flashcards',
             headerShown: true,
           }}
         />
         <Tabs.Screen
           name="index"
           options={{
-            title: "index",
+            title: 'Camera',
             headerShown: true,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile",
+            title: 'Profile',
             headerShown: false,
           }}
         />
       </Tabs>
-      
     </ProfileProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {},
-  triggerStyle: {
-    height: 40,
-    backgroundColor: "#fff",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: 50,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
+  settingsButton: {
+    marginLeft: 16,
   },
-  triggerText: {
-    fontSize: 16,
+  headerRightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  languageTrigger: {
+    height: 36,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 4,
+  },
+  languageText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0F0D23',
   },
 });

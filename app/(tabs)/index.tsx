@@ -1,117 +1,147 @@
-import { Entypo } from "@expo/vector-icons";
-import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import React, { useRef, useState } from "react";
+// app/(tabs)/index.tsx
+import { Entypo } from '@expo/vector-icons';
+import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import React, { JSX, useEffect, useRef, useState } from 'react';
 import {
   Button,
   Dimensions,
   Image,
   Modal,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  View
-} from "react-native";
+  View,
+} from 'react-native';
+// app/(tabs)/index.tsx
+import '@tensorflow/tfjs-react-native'; // side-effects: registers the native binding
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
+import { db, storage } from '../../FirebaseConfig';
 
-export default function Index() {
-  const [facing, setFacing] = useState<CameraType>("back");
+
+
+export default function Index(): JSX.Element {
+  const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
-  const cameraRef = useRef<CameraView>(null);
+  const cameraRef = useRef<CameraView | null>(null);
 
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
-  const [term, setTerm] = useState("");
-  const [definition, setDefinition] = useState("");
 
-  const screenWidth = Dimensions.get("window").width;
+  
+  const [term, setTerm]             = useState<string>('');
+  const [definition, setDefinition] = useState<string>('');
+
+
+  const saveFlashcard = async (): Promise<void> => {
+    if (!capturedUri) return;
+    try {
+      // download file into a blob
+      const resp = await fetch(capturedUri);
+      const blob = await resp.blob();
+
+      // upload to Storage
+      const path = `flashcards/${Date.now()}.jpg`;
+      console.log("storage:", storage);
+
+      const ref  = storageRef(storage, path);
+      await uploadBytes(ref, blob, { contentType: 'image/jpeg' })
+        .catch((err) => {
+          console.error('Upload Error Code:', err.code);
+          console.error('Upload Error Message:', err.message);
+          console.error('Server Response:', (err as any).serverResponse);
+          throw err; // dışarı atsın ki outer catch yakalasın
+       });
+
+      // get its URL
+      const url = await getDownloadURL(ref);
+
+      // write a Firestore document
+      await addDoc(collection(db, 'flashcards'), {
+        imageUrl:   url,
+        term,       // you can bind these to TextInputs later
+        definition, //
+        createdAt:  serverTimestamp(),
+      });
+
+      // reset & close
+      setCapturedUri(null);
+      setTerm('');
+      setDefinition('');
+      setModalVisible(false);
+      alert('Flashcard saved!');
+    } catch (e) {
+      console.error(e);
+      alert('Error saving card');
+    }
+  };
+
+
+
+
+  const screenWidth = Dimensions.get('window').width;
   const squareSize = screenWidth * 0.9;
 
-  const toggleCameraFacing = () =>
-    setFacing((f) => (f === "back" ? "front" : "back"));
+  useEffect(() => {
+    requestPermission();
+  }, [requestPermission]);
 
-  const grabPicture = async () => {
+  const toggleCameraFacing = (): void => {
+    setFacing((prev) => (prev === 'back' ? 'front' : 'back'));
+  };
+
+  const grabPicture = async (): Promise<void> => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({
-        skipProcessing: true,
-      });
+      const photo = await cameraRef.current.takePictureAsync({ skipProcessing: true });
       setCapturedUri(photo.uri);
       setModalVisible(true);
     }
   };
 
-  if (!permission) return null;
+  if (permission) {
+  ;
   if (!permission.granted) {
     return (
-      <View className="flex-1 bg-white justify-center items-center p-4">
-        <Text className="mb-4 text-gray-700 text-center">
-          Grant camera permission to continue
-        </Text>
-        <TouchableOpacity
-          onPress={requestPermission}
-          className="bg-blue-500 px-4 py-2 rounded"
-        >
-          <Text className="text-white font-medium">Grant</Text>
-        </TouchableOpacity>
+      <View style={styles.centered}>
+        <Text style={styles.infoText}>Grant camera permission to continue</Text>
+        <Button title="Grant" onPress={requestPermission} />
       </View>
     );
-  }
+  }}
 
   return (
-    <View className="flex-1 bg-white items-center justify-center">
-      {/* Camera Preview */}
-      <View
-        className="rounded-lg overflow-hidden border-2 border-dashed border-gray-400"
-        style={{ width: squareSize, height: squareSize }}
-      >
-        <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} />
-      </View>
-
-      {/* Flip & Create Button */}
-      {/* Flip & Create Button */}
-      <View className="flex-row items-center justify-center mt-5 relative w-full">
-        {/* Centered Capture Button */}
-        <TouchableOpacity
-          onPress={grabPicture}
-          className="bg-blue-600 p-10 rounded-full"
+    <View style={styles.container}>
+      {/* Camera Preview with Overlay Buttons */}
+      <View style={[styles.previewContainer, { width: squareSize, height: squareSize }]}>  
+        <CameraView
+          ref={cameraRef}
+          style={{ flex: 1 }}
+          facing={facing}
         />
-
-        {/* Flip Button Positioned to Right */}
-        <TouchableOpacity
-          onPress={toggleCameraFacing}
-          className="absolute right-10 bg-black bg-opacity-50 p-3 rounded-full"
-        >
+        <TouchableOpacity onPress={grabPicture} style={styles.captureButtonOverlay}>
+          <Entypo name="camera" size={32} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={toggleCameraFacing} style={styles.flipButtonOverlay}>
           <Entypo name="cycle" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
+      {/* Modal Popup Centered */}
       <Modal
         transparent
         visible={isModalVisible}
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View className="flex-1 bg-black/50 justify-center p-4">
-          <View className="bg-white rounded-lg p-6">
-            {capturedUri && (
-              <Image
-                source={{ uri: capturedUri }}
-                className="w-full h-80 rounded-md mb-4"
-              />
-            )}
-            <Text className="text-3xl text-center">Translated word</Text>
-            <Text className="text-2xl text-center">Base Language word</Text>
-            <View className="flex-row justify-between">
-              <Button
-                title="Cancel"
-                color="#DC2626"
-                onPress={() => setModalVisible(false)}
-              />
-              <Button
-                title="Save"
-                onPress={() => {
-                  /* TODO: save flashcard */
-                  setModalVisible(false);
-                }}
-              />
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {capturedUri && <Image source={{ uri: capturedUri }} style={styles.snapped} />}
+            <Text style={styles.title}>Translated word</Text>
+            <Text style={styles.subtitle}>Base Language word</Text>
+            <View style={styles.modalButtons}>
+              <Button title="Cancel" color="#DC2626" onPress={() => setModalVisible(false)} />
+              <Button title="Save" onPress={saveFlashcard}/>
+
             </View>
           </View>
         </View>
@@ -119,3 +149,87 @@ export default function Index() {
     </View>
   );
 }
+
+
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoText: {
+    marginBottom: 12,
+    fontSize: 16,
+    color: '#555',
+  },
+  previewContainer: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#CCC',
+    borderRadius: 10,
+    overflow: 'hidden',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  captureButtonOverlay: {
+    position: 'absolute',
+    bottom: 12,
+    alignSelf: 'center',
+    backgroundColor: '#2563eb',
+    padding: 16,
+    borderRadius: 32,
+  },
+  flipButtonOverlay: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 8,
+    borderRadius: 24,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+  },
+  snapped: {
+    width: '100%',
+    height: 200,
+    marginBottom: 12,
+    borderRadius: 6,
+  },
+  title: {
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+});

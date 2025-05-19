@@ -1,7 +1,12 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require("expo/metro-config");
-const { withNativeWind } = require('nativewind/metro');
- 
-const config = getDefaultConfig(__dirname)
- 
-module.exports = withNativeWind(config, { input: './app/globals.css' })
+const { getDefaultConfig } = require('expo/metro-config');
+
+// __dirname (çift alt çizgi!) doğru şekilde kullanılmalı
+const defaultConfig = getDefaultConfig(__dirname);
+
+// Özel ayarlar ekleniyor
+defaultConfig.resolver.sourceExts.push("cjs");
+defaultConfig.resolver.unstable_enablePackageExports = false;
+
+// Export config at the end
+module.exports = defaultConfig;

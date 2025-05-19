@@ -1,22 +1,32 @@
+import { AuthContextProvider, useAuth } from "@/context/AuthContext";
 import { ProfileProvider } from "@/context/ProfileContext";
-import { Stack } from "expo-router";
-import React from "react";
+import { Slot, useRouter } from "expo-router";
+import React, { useEffect } from "react";
 import { StatusBar } from "react-native";
-import "./globals.css";
+
+
+const InnerLayout = () => {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof isAuthenticated === "undefined") return;
+
+    if (!isAuthenticated) {
+      router.replace("/signup");
+    }
+  }, [isAuthenticated]);
+
+  return <Slot />;
+};
 
 export default function RootLayout() {
   return (
-    <ProfileProvider>
-      <StatusBar hidden={true} />
-
-      <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
-        />
-      </Stack>
+    <AuthContextProvider>
+      <ProfileProvider>
+        <StatusBar hidden />
+        <InnerLayout />
       </ProfileProvider>
+    </AuthContextProvider>
   );
 }

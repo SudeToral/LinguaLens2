@@ -88,3 +88,4 @@ const styles = StyleSheet.create({
       padding: 5,
     },
   });
+  export default DropdownMenu;

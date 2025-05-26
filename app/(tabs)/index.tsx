@@ -1,6 +1,10 @@
 import { Entypo } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import React, { useRef, useState } from "react";
+
+import { detectObjects } from "@/utils/vision";
+
+
 import {
   Button,
   Dimensions,
@@ -28,16 +32,29 @@ export default function Index() {
   const toggleCameraFacing = () =>
     setFacing((f) => (f === "back" ? "front" : "back"));
 
-  const grabPicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({
-        skipProcessing: true,
-      });
-      setCapturedUri(photo.uri);
-      setModalVisible(true);
-    }
-  };
+  const [labels, setLabels] = useState<string[] | null>(null);
 
+  const grabPicture = async () => {
+    if (!cameraRef.current) return;
+  
+    const photo = await cameraRef.current.takePictureAsync({ skipProcessing: true });
+    console.log("📸 Photo URI:", photo.uri);                 // ①
+  
+    try {
+      const detected = await detectObjects(photo.uri);
+      console.log("🔍 Detected labels:", detected);          // ②
+      setLabels(detected);
+    } catch (err) {
+      console.log("❌ Vision error:", err);                  // ③
+      setLabels(["Detection failed"]);
+    }
+  
+    setCapturedUri(photo.uri);
+    setModalVisible(true);
+    console.log("👁️ Modal should be visible now");          // ④
+  };
+  
+  
   if (!permission) return null;
   if (!permission.granted) {
     return (
@@ -73,7 +90,9 @@ export default function Index() {
         visible={isModalVisible}
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
-      >
+        onShow={() => console.log("✅ Modal opened")}
+      >  
+
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             {capturedUri && (

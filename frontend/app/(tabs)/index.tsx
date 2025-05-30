@@ -1,28 +1,34 @@
 import { Entypo } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Button,
   Dimensions,
   Image,
   Modal,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { account } from "../lib/appwriteConfig";
 import { getBaseWord, uploadFlashcard } from "../services/photoService";
-import axios from "axios"
 
 export default function Index() {
+  const [userId, setUserId] = useState<string>("");
+
+  useEffect(() => {
+    account
+      .get()
+      .then((user) => setUserId(user.$id))
+      .catch((err) => console.error("Cannot fetch user:", err));
+  }, []);
+
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
-  const [term, setTerm] = useState("");
-  const [definition, setDefinition] = useState("");
   const [baseWord, setBaseWord] = useState("");
 
   const screenWidth = Dimensions.get("window").width;
@@ -32,63 +38,77 @@ export default function Index() {
     setFacing((f) => (f === "back" ? "front" : "back"));
 
   const grabPicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({
-        skipProcessing: true,
-      });
-      const newBaseWordModule = await getBaseWord(photo.uri);
-      setBaseWord(newBaseWordModule.baseWord);
-      setCapturedUri(photo.uri);
-      setModalVisible(true);
-    }
+    if (!cameraRef.current) return;
+    const photo = await cameraRef.current.takePictureAsync({
+      skipProcessing: true,
+    });
+    const newBaseWordModule = await getBaseWord(photo.uri);
+    setBaseWord(newBaseWordModule.baseWord);
+    setCapturedUri(photo.uri);
+    setModalVisible(true);
   };
 
-  if (!permission) return null;
-  if (!permission.granted) {
-    return (
-      <View style={styles.permissionContainer}>
-        <Text style={styles.permissionText}>
-          Grant camera permission to continue
-        </Text>
-        <TouchableOpacity onPress={requestPermission} style={styles.grantButton}>
-          <Text style={styles.grantButtonText}>Grant</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   const handleSaveFlashcard = async (
-    userId: string,
     baseWord: string,
     translatedWord: string,
     exampleSentence: string,
     imageUri: string
   ) => {
+    if (!userId) {
+      console.warn("No user ID yet—cannot upload flashcard");
+      return;
+    }
     try {
-      const response = await uploadFlashcard(
+      const resp = await uploadFlashcard(
         userId,
         baseWord,
         translatedWord,
         exampleSentence,
         imageUri
       );
-      console.log("Flashcard uploaded successfully:", response);
-    } catch (error) {
-      console.error("Error uploading flashcard:", error);
+      console.log("Flashcard uploaded successfully:", resp);
+    } catch (err) {
+      console.error("Error uploading flashcard:", err);
     }
   };
 
+  if (!permission) return null;
+  if (!permission.granted) {
+    return (
+      <View className="flex-1 bg-white justify-center items-center p-4">
+        <Text className="mb-4 text-gray-700 text-center">
+          Grant camera permission to continue
+        </Text>
+        <TouchableOpacity
+          onPress={requestPermission}
+          className="bg-blue-500 px-4 py-3 rounded-lg"
+        >
+          <Text className="text-white font-medium">Grant</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-white items-center justify-center">
       {/* Camera Preview */}
-      <View style={[styles.cameraContainer, { width: squareSize, height: squareSize }]}>
-        <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
+      <View
+        className="border-2 border-dashed border-gray-300 rounded-xl overflow-hidden"
+        style={{ width: squareSize, height: squareSize }}
+      >
+        <CameraView ref={cameraRef} className="flex-1" facing={facing} />
       </View>
 
       {/* Flip & Capture Buttons */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity onPress={grabPicture} style={styles.captureButton} />
-        <TouchableOpacity onPress={toggleCameraFacing} style={styles.flipButton}>
+      <View className="flex-row items-center justify-center mt-5 w-full relative">
+        <TouchableOpacity
+          onPress={grabPicture}
+          className="bg-blue-600 p-10 rounded-full"
+        />
+        <TouchableOpacity
+          onPress={toggleCameraFacing}
+          className="absolute right-10 bg-black/50 p-2 rounded-full"
+        >
           <Entypo name="cycle" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -100,14 +120,17 @@ export default function Index() {
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View className="flex-1 bg-black/50 justify-center p-4">
+          <View className="bg-white rounded-2xl p-6">
             {capturedUri && (
-              <Image source={{ uri: capturedUri }} style={styles.imagePreview} />
+              <Image
+                source={{ uri: capturedUri }}
+                className="w-full h-80 rounded-xl mb-4"
+              />
             )}
-            <Text style={styles.modalTitle}>Translated word</Text>
-            <Text style={styles.modalSubtitle}>{baseWord}</Text>
-            <View style={styles.modalButtons}>
+            <Text className="text-2xl text-center mb-1">Translated word</Text>
+            <Text className="text-lg text-center mb-4">{baseWord}</Text>
+            <View className="flex-row justify-between">
               <Button
                 title="Cancel"
                 color="#DC2626"
@@ -117,15 +140,12 @@ export default function Index() {
                 title="Save"
                 onPress={async () => {
                   if (capturedUri) {
-                    handleSaveFlashcard(
-                      "682b40d4000fe02b3527",        // Replace with actual Appwrite user ID
-                      baseWord,                 // baseWord
-                      "definition",           // translatedWord
-                      "Sample sentence",    // example sentence
-                      capturedUri          // image URI from camera
+                    await handleSaveFlashcard(
+                      baseWord,
+                      "definition",
+                      "Sample sentence",
+                      capturedUri
                     );
-                    //const response = await axios.get("http://192.168.1.102:8000/ping");
-
                   }
                   setModalVisible(false);
                 }}
@@ -137,95 +157,3 @@ export default function Index() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cameraContainer: {
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#ccc",
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    position: "relative",
-    width: "100%",
-  },
-  captureButton: {
-    backgroundColor: "#2563EB",
-    padding: 40,
-    borderRadius: 999,
-  },
-  flipButton: {
-    position: "absolute",
-    right: 40,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    padding: 10,
-    borderRadius: 999,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 16,
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 24,
-  },
-  imagePreview: {
-    width: "100%",
-    height: 320,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  modalSubtitle: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  permissionContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  permissionText: {
-    marginBottom: 16,
-    color: "#374151",
-    textAlign: "center",
-  },
-  grantButton: {
-    backgroundColor: "#3B82F6",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  grantButtonText: {
-    color: "#fff",
-    fontWeight: "500",
-  },
-});

@@ -1,115 +1,110 @@
 import { useAuth } from '@/context/AuthContext';
-import { Redirect, useRouter } from 'expo-router'; // ✅ router import edildi
+import { Redirect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import AnimatedSnackbar from "./Components/AnimatedSnackbar"; // 🔔 Snackbar bileşeni
 
 const SignUp: React.FC = () => {
   const { isAuthenticated, register } = useAuth();
-  const router = useRouter(); // ✅ yönlendirme için router kullanımı
+  const router = useRouter();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
+  const [snackVisible, setSnackVisible] = useState(false);
+  const [snackMsg, setSnackMsg] = useState('');
+
+  const showSnackbar = (msg: string) => {
+    setSnackMsg(msg);
+    setSnackVisible(true);
+  };
+
+  const validateEmail = (email: string) =>
+    /^\S+@\S+\.\S+$/.test(email);
 
   const handleSubmit = async () => {
+    if (!username || !email || !password) {
+      return showSnackbar('All fields are required.');
+    }
+
+    if (!validateEmail(email)) {
+      return showSnackbar('Please enter a valid email address.');
+    }
+
+    if (password.length < 8) {
+      return showSnackbar('Password must be at least 8 characters.');
+    }
+
     try {
       await register(email, password, username);
-    } catch (error) {
-      console.log("Registration failed:", error);
+    } catch (error: any) {
+      console.log('Registration failed:', error);
+      showSnackbar(error?.message ?? 'Registration failed. Please try again.');
     }
   };
 
   if (isAuthenticated) return <Redirect href="/" />;
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.headline}>SignUp</Text>
+    <View className="flex-1 justify-center px-6 bg-white">
+      <View className="w-full">
+        <Text className="text-center text-3xl font-bold italic text-black mb-10">
+          Sign Up
+        </Text>
 
-        <Text>Username:</Text>
+        <Text className="text-base text-gray-800">Username:</Text>
         <TextInput
-          placeholder="Choose a username..."
-          style={styles.input}
+          placeholder="Choose a username."
+          className="border border-gray-300 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
           value={username}
           onChangeText={setUsername}
         />
 
-        <Text>Email:</Text>
+        <Text className="text-base text-gray-800">Email:</Text>
         <TextInput
-          placeholder="Enter your email..."
-          style={styles.input}
+          placeholder="Enter your email."
+          className="border border-gray-300 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
-        <Text>Password:</Text>
+        <Text className="text-base text-gray-800">Password:</Text>
         <TextInput
-          placeholder="Create a password..."
-          style={styles.input}
+          placeholder="Create a password."
+          className="border border-gray-300 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Register</Text>
+        <TouchableOpacity
+          className="bg-purple-100 py-3 rounded-lg items-center mt-2"
+          onPress={handleSubmit}
+        >
+          <Text className="text-black text-lg font-semibold">Register</Text>
         </TouchableOpacity>
 
-        {/* 👇 Sign In yönlendirmesi */}
-        <TouchableOpacity onPress={() => router.replace('/signin')} style={styles.signinLink}>
-          <Text style={styles.signinText}>
-            Already have an account? <Text style={styles.signinTextBold}>Sign In</Text>
+        <TouchableOpacity
+          onPress={() => router.replace('/signin')}
+          className="mt-6 items-center"
+        >
+          <Text className="text-sm text-gray-600">
+            Already have an account?{' '}
+            <Text className="font-bold text-gray-900 underline ">Sign In</Text>
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* 🔔 Animated Snackbar */}
+      <AnimatedSnackbar
+        message={snackMsg}
+        visible={snackVisible}
+        onClose={() => setSnackVisible(false)}
+      />
     </View>
   );
 };
 
 export default SignUp;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  headline: {
-    textAlign: 'center',
-    marginTop: -100,
-    marginBottom: 50,
-    fontWeight: '700',
-    fontStyle: 'italic',
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 10,
-    borderColor: 'grey',
-  },
-  button: {
-    backgroundColor: 'black',
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-  },
-  signinLink: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  signinText: {
-    fontSize: 14,
-    color: '#4B5563',
-  },
-  signinTextBold: {
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-});

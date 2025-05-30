@@ -13,6 +13,7 @@ import {
 import { account } from "../lib/appwriteConfig";
 import { getBaseWord, uploadFlashcard } from "../services/photoService";
 import { translateWord } from "../services/translationService";
+import { generateSentences } from "../services/sentenceService";
 
 export default function Index() {
   const [userId, setUserId] = useState<string>("");
@@ -32,6 +33,7 @@ export default function Index() {
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [baseWord, setBaseWord] = useState("");
   const [translatedWord, setTranslatedWord] = useState("");
+  const [sentences, setSentences] = useState(Array<string>);
 
   const screenWidth = Dimensions.get("window").width;
   const squareSize = screenWidth * 0.9;
@@ -39,27 +41,44 @@ export default function Index() {
   const toggleCameraFacing = () =>
     setFacing((f) => (f === "back" ? "front" : "back"));
 
+  const handleSentences = async (): Promise<string[]> => {
+    if (!translatedWord) {
+      console.log("No translated word!");
+      return [];
+    }
+    try {
+      const result = await generateSentences({
+        word: translatedWord,
+        interest: "",
+        count: 3,
+        language: "English",
+        level: "A2-B1",
+      });
+      setSentences(result);    // still update state for display
+      return result;           // <-- return the fresh array
+    } catch (err) {
+      console.error("Error generating sentences:", err);
+      return [];
+    }
+  };
+  
+
   const grabPicture = async () => {
     if (!cameraRef.current) return;
     const photo = await cameraRef.current.takePictureAsync({
       skipProcessing: true,
     });
-    const newBaseWordModule = await getBaseWord(photo.uri);
-    setBaseWord(newBaseWordModule.baseWord);
-    await handleTranslation();
+    const { baseWord: freshBase } = await getBaseWord(photo.uri);
+    setBaseWord(freshBase);
+    try {
+      const t = await translateWord(freshBase);
+      setTranslatedWord(t);
+    } catch (err) {
+      console.error("Error translating word:", err);
+    }
     setCapturedUri(photo.uri);
     setModalVisible(true);
   };
-
-  const handleTranslation = async () => {
-    try {
-      const resp = await translateWord(baseWord);
-      setTranslatedWord(resp);
-    }
-    catch (err) {
-      console.error("Error translating word:", err);
-    }
-  }
 
   const handleSaveFlashcard = async (
     baseWord: string,
@@ -153,10 +172,14 @@ export default function Index() {
                 title="Save"
                 onPress={async () => {
                   if (capturedUri) {
+                    const fresh = await handleSentences();
+
+                    const combined = fresh.join(" ");
+                    console.log("Combined: ", combined)
                     await handleSaveFlashcard(
                       baseWord,
-                      "definition",
-                      "Sample sentence",
+                      translatedWord,
+                      combined,
                       capturedUri
                     );
                   }

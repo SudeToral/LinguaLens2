@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { account } from "../lib/appwriteConfig";
 import { getBaseWord, uploadFlashcard } from "../services/photoService";
+import { translateWord } from "../services/translationService";
 
 export default function Index() {
   const [userId, setUserId] = useState<string>("");
@@ -30,6 +31,7 @@ export default function Index() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [baseWord, setBaseWord] = useState("");
+  const [translatedWord, setTranslatedWord] = useState("");
 
   const screenWidth = Dimensions.get("window").width;
   const squareSize = screenWidth * 0.9;
@@ -44,9 +46,20 @@ export default function Index() {
     });
     const newBaseWordModule = await getBaseWord(photo.uri);
     setBaseWord(newBaseWordModule.baseWord);
+    await handleTranslation();
     setCapturedUri(photo.uri);
     setModalVisible(true);
   };
+
+  const handleTranslation = async () => {
+    try {
+      const resp = await translateWord(baseWord);
+      setTranslatedWord(resp);
+    }
+    catch (err) {
+      console.error("Error translating word:", err);
+    }
+  }
 
   const handleSaveFlashcard = async (
     baseWord: string,
@@ -96,7 +109,7 @@ export default function Index() {
         className="border-2 border-dashed border-gray-300 rounded-xl overflow-hidden"
         style={{ width: squareSize, height: squareSize }}
       >
-        <CameraView ref={cameraRef} className="flex-1" facing={facing} />
+        <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} />
       </View>
 
       {/* Flip & Capture Buttons */}
@@ -128,7 +141,7 @@ export default function Index() {
                 className="w-full h-80 rounded-xl mb-4"
               />
             )}
-            <Text className="text-2xl text-center mb-1">Translated word</Text>
+            <Text className="text-2xl text-center mb-1">{translatedWord}</Text>
             <Text className="text-lg text-center mb-4">{baseWord}</Text>
             <View className="flex-row justify-between">
               <Button

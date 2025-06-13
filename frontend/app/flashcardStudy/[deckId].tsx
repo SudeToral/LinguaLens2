@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react-native"; // Optional: Replace with your 
 import { use, useEffect, useState } from "react";
 import { fetchFlashcards } from "../services/flashcardService";
 import { account } from "../lib/appwriteConfig";
+import { storage } from "../lib/appwriteConfig";
 
 
 type Flashcard = {
@@ -75,6 +76,8 @@ const FlashcardStudy = () => {
   console.log("Current card type:", typeof currentCard);
   const baseWord = (currentCard as any).baseWord;
   console.log("Base word:", baseWord);
+  const imageUrl = storage.getFileView("6834cf58002581c4badd", (currentCard as any).photoId).href;
+  console.log("Image URL:", imageUrl);
 
   return (
     <SafeAreaView className="flex-1 bg-primary p-4 justify-center">
@@ -93,7 +96,7 @@ const FlashcardStudy = () => {
         
         <FlashCard
           frontText={(currentCard as any).translatedWord}
-          frontImageUri="https://example.com/front.jpg"
+          frontImageUri={imageUrl}
           backText={(currentCard as any).baseWord}
           backSentences= {(currentCard as any).sentences}
         />

@@ -14,6 +14,7 @@ import { account } from "../lib/appwriteConfig";
 import { getBaseWord, uploadFlashcard } from "../services/photoService";
 import { translateWord } from "../services/translationService";
 import { generateSentences } from "../services/sentenceService";
+import DeckModal from "../Components/DeckModal";
 
 export default function Index() {
   const [userId, setUserId] = useState<string>("");
@@ -30,6 +31,7 @@ export default function Index() {
   const cameraRef = useRef<CameraView>(null);
 
   const [isModalVisible, setModalVisible] = useState(false);
+  const [areDecksVisibe, setAreDecksVisibe] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [baseWord, setBaseWord] = useState("");
   const [translatedWord, setTranslatedWord] = useState("");
@@ -61,6 +63,26 @@ export default function Index() {
       return [];
     }
   };
+  const [selectedDeck, setSelectedDeck] = useState("");
+  const selectDeck = async (deckName: string) => {
+
+    const fresh = await handleSentences();
+    const combined = fresh.join(" ");
+    console.log("Combined: ", combined);
+    deckName = deckName.trim();
+    if (capturedUri) {
+      await handleSaveFlashcard(
+        baseWord,
+        translatedWord,
+        combined,
+        capturedUri,
+        deckName,
+      );
+    } else {
+      console.warn("Captured URI is null—cannot save flashcard");
+    }
+  }
+
   
 
   const grabPicture = async () => {
@@ -91,7 +113,8 @@ export default function Index() {
     baseWord: string,
     translatedWord: string,
     exampleSentence: string,
-    imageUri: string
+    imageUri: string,
+    deckName: string
   ) => {
     if (!userId) {
       console.warn("No user ID yet—cannot upload flashcard");
@@ -103,7 +126,8 @@ export default function Index() {
         baseWord,
         translatedWord,
         exampleSentence,
-        imageUri
+        imageUri,
+        deckName
       );
       console.log("Flashcard uploaded successfully:", resp);
     } catch (err) {
@@ -183,18 +207,7 @@ export default function Index() {
               <TouchableOpacity
                 onPress={async () => {
                   setModalVisible(false);
-                  if (capturedUri) {
-                    const fresh = await handleSentences();
-
-                    const combined = fresh.join(" ");
-                    console.log("Combined: ", combined)
-                    await handleSaveFlashcard(
-                      baseWord,
-                      translatedWord,
-                      combined,
-                      capturedUri
-                    );
-                  }
+                  setAreDecksVisibe(true);
                 }}
                 className="bg-tertiary px-8 py-3 rounded-3xl justify-center">
                   <Text className="text-xl font-semibold">Save</Text>
@@ -203,6 +216,14 @@ export default function Index() {
           </View>
         </View>
       </Modal>
+
+      {/* Flashcard Modal */}
+      <DeckModal visible={areDecksVisibe}
+        onClose={() => setAreDecksVisibe(false)}
+        onSelectDeck={(deckName) => { setAreDecksVisibe(false); 
+        selectDeck(deckName);
+        console.log(`Selected deck: ${deckName}`);
+  }} />
     </View>
   );
 }

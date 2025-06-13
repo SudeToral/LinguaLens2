@@ -10,7 +10,8 @@ export const uploadFlashcard = async (
   baseWord: string,
   translatedWord: string,
   sentences: string,
-  imageUri: string
+  imageUri: string,
+  deckName: string
 ): Promise<any> => {
   const formData = new FormData();
 
@@ -18,6 +19,8 @@ export const uploadFlashcard = async (
   formData.append('baseWord', baseWord);
   formData.append('translatedWord', translatedWord);
   formData.append('sentences', sentences);
+  formData.append('deckName', deckName);
+  console.log("Appended deckName: ", deckName);
 
   formData.append('file', {
     uri: imageUri,

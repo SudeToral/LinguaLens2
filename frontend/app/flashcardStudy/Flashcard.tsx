@@ -5,10 +5,10 @@ type FlashCardProps = {
   frontText: string;
   frontImageUri: string;
   backText: string;
-  backImageUri?: string;
+  backSentences: string;
 };
 
-const FlashCard = ({ frontText, frontImageUri, backText, backImageUri }: FlashCardProps) => {
+const FlashCard = ({ frontText, frontImageUri, backText, backSentences }: FlashCardProps) => {
   const [flipped, setFlipped] = useState(false);
 
   return (
@@ -29,9 +29,7 @@ const FlashCard = ({ frontText, frontImageUri, backText, backImageUri }: FlashCa
             ) */}
             <Text className="text-black text-center mt-10 text-4xl font-bold mb-5">{backText}</Text>
             <Text className="text-black text-center mt-4 text-xl font-semibold">Example Sentences</Text>
-            <Text className="text-black text-center mt-4 text-lg leading-loose">Lorem ipsum dolor sit amet, consectetur adipiscing elit. {"\n"}
-            Donec sollicitudin vel lorem in dignissim.{"\n"}
-            Etiam lectus arcu, semper sit amet porttitor id, luctus quis sapien.
+            <Text className="text-black text-center mt-4 text-lg leading-loose">{backSentences || "No sentences available."}
             </Text>
         </View>
     </View>

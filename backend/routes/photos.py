@@ -14,7 +14,8 @@ async def upload_flashcard(
     sentences: str = Form(...),
     baseWord: str = Form(...),
     translatedWord: str = Form(...),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    deckName: str = Form(...)
 ):
     try:
         # 1) Benzersiz file ID oluştur
@@ -46,7 +47,8 @@ async def upload_flashcard(
                 "baseWord": baseWord,
                 "translatedWord": translatedWord,
                 "sentences": sentences,
-                "userId": userId
+                "userId": userId,
+                "deckName": deckName
             }
         )
 

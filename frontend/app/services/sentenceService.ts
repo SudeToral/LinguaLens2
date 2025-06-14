@@ -28,7 +28,6 @@ export async function generateSentences(
     const payload: GenerateRequest = {
       interest: "",
       count: 3,
-      language: "Turkish",
       level: "A2-B1",
       ...params,
     };

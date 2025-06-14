@@ -2,6 +2,7 @@ import apiClient from './apiClient';
 
 export interface TranslateRequest {
   word: string;
+  target_language: string;
 }
 
 export interface TranslateResponse {
@@ -13,9 +14,9 @@ export interface TranslateResponse {
  * @param word The string you want translated
  * @returns Promise that resolves to the translated string
  */
-export async function translateWord(word: string): Promise<string> {
+export async function translateWord(word: string, target_language: string): Promise<string> {
   try {
-    const payload: TranslateRequest = { word };
+    const payload: TranslateRequest = { word, target_language };
     const response = await apiClient.post<TranslateResponse>("/translate", payload);
     return response.data.translated_word;
   } catch (err) {

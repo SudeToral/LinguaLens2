@@ -1,4 +1,3 @@
-
 import { MaterialIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
 import React, { useState } from "react";
@@ -6,6 +5,17 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { ProfileProvider } from "../../context/ProfileContext";
 import { DropdownMenu } from "../Components/DropDownMenu";
 import { MenuOption } from "../Components/MenuOption";
+import { create } from 'zustand';
+
+interface StoreState {
+  targetLang: string;
+  setTargetLang: (v: string) => void;
+}
+
+export const targetLanguage = create<StoreState>((set) => ({
+  targetLang: 'Turkish',
+  setTargetLang: (v) => set({ targetLang: v }),
+}));
 
 export function SettingsButton() {
   return (
@@ -19,7 +29,7 @@ export function SettingsButton() {
 
 export default function TabsLayout() {
   const [visible, setVisible] = useState(false);
-  const [language, setLanguage] = useState("english");
+  const { targetLang, setTargetLang } = targetLanguage();
 
   return (
     <ProfileProvider>
@@ -42,6 +52,7 @@ export default function TabsLayout() {
           },
           headerStyle: {
             backgroundColor: "#708A58",
+            height: 120,
           },
           tabBarIconStyle: {
             justifyContent: "center",
@@ -56,13 +67,13 @@ export default function TabsLayout() {
                 handleClose={() => setVisible(false)}
                 trigger={
                   <View className="h-10 bg-white flex-row justify-center items-center w-20 px-2 py-1 rounded">
-                    <Text className="font-semibold text-black font-playpen">{language}</Text>
+                    <Text className="font-semibold text-black font-playpen">{targetLang}</Text>
                   </View>
                 }
               >
                 <MenuOption
                   onSelect={() => {
-                    setLanguage("spanish");
+                    setTargetLang("spanish");
                     setVisible(false);
                   }}
                 >
@@ -70,7 +81,7 @@ export default function TabsLayout() {
                 </MenuOption>
                 <MenuOption
                   onSelect={() => {
-                    setLanguage("turkish");
+                    setTargetLang("turkish");
                     setVisible(false);
                   }}
                 >
@@ -78,7 +89,7 @@ export default function TabsLayout() {
                 </MenuOption>
                 <MenuOption
                   onSelect={() => {
-                    setLanguage("english");
+                    setTargetLang("english");
                     setVisible(false);
                   }}
                 >

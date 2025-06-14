@@ -16,6 +16,9 @@ import { getBaseWord, uploadFlashcard } from "../services/photoService";
 import { translateWord } from "../services/translationService";
 import { generateSentences } from "../services/sentenceService";
 import DeckModal from "../Components/DeckModal";
+import { targetLanguage } from "./_layout";
+
+
 
 export default function Index() {
   const [userId, setUserId] = useState<string>("");
@@ -37,9 +40,10 @@ export default function Index() {
   const [baseWord, setBaseWord] = useState("");
   const [translatedWord, setTranslatedWord] = useState("");
   const [sentences, setSentences] = useState(Array<string>);
-
+  const {targetLang, setTargetLang} = targetLanguage();
   const screenWidth = Dimensions.get("window").width;
-  const squareSize = screenWidth * 0.9;
+  const screenHeight = Dimensions.get("window").height;
+  const squareSize = screenHeight * 0.4;
 
   const toggleCameraFacing = () =>
     setFacing((f) => (f === "back" ? "front" : "back"));
@@ -54,7 +58,7 @@ export default function Index() {
         word: translatedWord,
         interest: "",
         count: 3,
-        language: "English",
+        language: targetLang,
         level: "A2-B1",
       });
       setSentences(result);    // still update state for display
@@ -103,7 +107,7 @@ export default function Index() {
       const { baseWord: freshBase } = await getBaseWord(photo.uri);
       setBaseWord(freshBase);
   
-      const t = await translateWord(freshBase);
+      const t = await translateWord(freshBase, targetLang);
       setTranslatedWord(t);
     } catch (err) {
       console.error("Error processing image:", err);
@@ -145,7 +149,7 @@ export default function Index() {
         </Text>
         <TouchableOpacity
           onPress={requestPermission}
-          className="bg-blue-500 px-4 py-3 rounded-lg"
+          className="bg-support px-4 py-3 rounded-lg"
         >
           <Text className="text-white font-medium">Grant</Text>
         </TouchableOpacity>
@@ -156,12 +160,33 @@ export default function Index() {
   return (
     <View className="flex-1 bg-primary items-center justify-center">
       {/* Camera Preview */}
+
       <View
         className=" border-solid border-secondary overflow-hidden"
-        style={{ width: squareSize, height: squareSize, borderRadius: 48, borderWidth: 12}}
+        style={{ width: squareSize, height: squareSize, borderRadius: 48, borderWidth: 12 ,
+          transform: [
+            { translateX: (screenWidth ) / 2 - (squareSize / 2 ) - (screenWidth*0.05)},
+            { translateY: (screenHeight ) / 4 - (squareSize / 2 ) - (screenHeight*0.05) },
+          ]
+        }}
       >
-        <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} className="roundedn-3xl"/>
-      </View>
+        <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} className="rounded-3xl z-200"/>
+        </View>
+        <Image className="justify-center"
+      source={require("../../assets/images/cat-peek.png")}
+      style={{
+        position: "absolute",
+
+        transform: [
+          { translateX: (screenWidth ) / 2 - (squareSize / 2 ) - (screenWidth*0.05)},
+          { translateY: (screenHeight ) / 4 - (squareSize / 2 ) - (screenHeight*0.14) },
+        ],
+        width: squareSize*1.5,
+        height: squareSize*1.5,
+        resizeMode: "contain",
+      }}
+    />
+
 
       {/* Flip & Capture Buttons */}
       <View className="flex-row items-center justify-center mt-5 w-full relative">

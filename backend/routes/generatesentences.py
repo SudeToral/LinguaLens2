@@ -17,7 +17,7 @@ class GenerateRequest(BaseModel):
     word: str
     interest: Optional[str] = ""
     count: Optional[int] = 3
-    language: Optional[str] = "Turkish"
+    language: Optional[str] = ""
     level: Optional[str] = "A2-B1"
 
 class GenerateResponse(BaseModel):
@@ -35,8 +35,8 @@ def generate_personalized_sentences(
             "role": "system",
             "content": (
                 f"You are an AI assistant for a language-learning app. "
-                f"Generate {count} short, natural example sentences in Turkish. "
-                f"Make sure everything you produce is in  Turkish—do not use any other language. "
+                f"Generate {count} short, natural example sentences in {language}. "
+                f"Make sure everything you produce is in  {language} - do not use any other language. "
                 f"Generate the sentences at {level} level. "
                 f"Use the target word \"{word}\" exactly once per sentence, "
                 f"and make each example relevant to the user's interest: \"{interest}\"."

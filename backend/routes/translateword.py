@@ -13,6 +13,7 @@ if not openai_api_key:
 
 class TranslateRequest(BaseModel):
     word: str
+    target_language: str
 
 class TranslateResponse(BaseModel):
     translated_word: str
@@ -24,7 +25,7 @@ async def translate(req: TranslateRequest):
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a translator. Translate the user’s word into turkish. Reply with only the word."},
+                {"role": "system", "content": "You are a translator. Translate the user’s word into {req.target_language}. Reply with only the answer."},
                 {"role": "user", "content": req.word}
             ],
             max_tokens=60,

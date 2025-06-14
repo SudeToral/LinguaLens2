@@ -16,6 +16,7 @@ export interface TranslateResponse {
  */
 export async function translateWord(word: string, target_language: string): Promise<string> {
   try {
+    console.log("Transalating word to: ", target_language);
     const payload: TranslateRequest = { word, target_language };
     const response = await apiClient.post<TranslateResponse>("/translate", payload);
     return response.data.translated_word;

@@ -7,7 +7,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
  * Update `baseURL` to match your backend address.
  */
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http:/192.168.1.100:8000', // TODO: Replace with your FastAPI server URL
+  baseURL: 'http:/192.168.1.107:8000', // TODO: Replace with your FastAPI server URL
   timeout: 100000,
   headers: {
     'Content-Type': 'application/json',

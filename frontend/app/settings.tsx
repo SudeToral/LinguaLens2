@@ -14,8 +14,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft } from "lucide-react-native";
 import { useAuth } from "../context/AuthContext";
 import { account } from "./lib/appwriteConfig";
+import AnimatedSnackbar from "./Components/AnimatedSnackbar"; // ✅ Snackbar import edildi
 
-const LANGUAGES = ["English", "Turkish", "Spanish", "German", "French"];
+const LANGUAGES = ["English"];
 
 const Settings = () => {
   const router = useRouter();
@@ -29,17 +30,20 @@ const Settings = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
 
+  const [snackVisible, setSnackVisible] = useState(false); // ✅ Snackbar görünürlüğü
+  const [snackMsg, setSnackMsg] = useState("");
+
+  const showSnackbar = (msg: string) => {
+    setSnackMsg(msg);
+    setSnackVisible(true);
+  };
+
   // 📩 Delete account handler
   const handleDeleteAccount = async () => {
     try {
-      // Şifreyi sabit bir değerle değiştir
       await account.updatePassword("xxxxxxxx", deletePassword);
-
-      // Oturumu kapat
       await signout();
       router.replace("/signin");
-
-      console.log("Şifre değiştirildi ve çıkış yapıldı.");
     } catch (error) {
       console.error("Hesap silme işlemi başarısız:", error);
       Alert.alert("Hata", "Şifre yanlış veya işlem başarısız.");
@@ -94,7 +98,7 @@ const Settings = () => {
       {/* Language Modal */}
       <Modal transparent animationType="fade" visible={languageModalVisible}>
         <View className="flex-1 bg-black/50 justify-center items-center">
-          <View className="bg-white w-11/12 rounded-2xl p-5">
+          <View className="bg-primary w-11/12 rounded-2xl p-5">
             <Text className="text-lg font-bold mb-4 text-black">
               Choose Base Language
             </Text>
@@ -105,6 +109,7 @@ const Settings = () => {
                 onPress={() => {
                   setLanguage(lang);
                   setLanguageModalVisible(false);
+                  showSnackbar(`Base language set to ${lang}`); // ✅ Snackbar tetikleniyor
                 }}
               >
                 <Text className="text-base text-black">{lang}</Text>
@@ -133,7 +138,7 @@ const Settings = () => {
               onChangeText={setDeletePassword}
             />
             <View className="flex-row justify-between mt-2">
-            <Pressable onPress={() => setDeleteModalVisible(false)}>
+              <Pressable onPress={() => setDeleteModalVisible(false)}>
                 <Text className="text-gray-500 font-semibold">Cancel</Text>
               </Pressable>
               <Pressable onPress={handleDeleteAccount}>
@@ -143,6 +148,13 @@ const Settings = () => {
           </View>
         </View>
       </Modal>
+
+      {/* ✅ Snackbar */}
+      <AnimatedSnackbar
+        message={snackMsg}
+        visible={snackVisible}
+        onClose={() => setSnackVisible(false)}
+      />
     </SafeAreaView>
   );
 };

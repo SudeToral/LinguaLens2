@@ -240,9 +240,11 @@ export const FlashCards = () => {
                   position: "absolute",
                   top: menuPosition.y + 10,
                   left: menuPosition.x,
-                  backgroundColor: "#fff",
+                  backgroundColor: "#FFF1CA",
                   padding: 12,
                   borderRadius: 8,
+                  borderColor: "black",
+                  borderWidth: 2,
                   elevation: 5,
                   shadowColor: "#000",
                   shadowOpacity: 0.2,
@@ -250,10 +252,10 @@ export const FlashCards = () => {
                 }}
               >
                 <Pressable onPress={handleEdit}>
-                  <Text className="text-blue-600 py-1">Edit Deck</Text>
+                  <Text className="text-support py-1 ">Edit Deck</Text>
                 </Pressable>
                 <Pressable onPress={handleDelete}>
-                  <Text className="text-red-600 py-1">Delete Deck</Text>
+                  <Text className="text-secondary py-1">Delete Deck</Text>
                 </Pressable>
               </View>
             )}
@@ -297,7 +299,7 @@ export const FlashCards = () => {
             className="mt-4 bg-secondary p-4 rounded-lg items-center"
             onPress={() => setIsEditModalVisible(false)}
           >
-            <Text className="text-white font-bold">Done</Text>
+            <Text className="text-black font-bold">Done</Text>
           </Pressable>
         </SafeAreaView>
       </Modal>

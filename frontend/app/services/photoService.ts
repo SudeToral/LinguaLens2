@@ -20,7 +20,7 @@ export const uploadFlashcard = async (
       imageUri,
       [{ resize: { width: 800 } }], // Resize to 800px width, maintain aspect ratio
       {
-        compress: 0.7, // 70% quality
+        compress: 0.5, // 70% quality
         format: ImageManipulator.SaveFormat.JPEG,
       }
     );

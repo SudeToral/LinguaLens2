@@ -74,13 +74,13 @@ export default function TabsLayout() {
                 handleOpen={() => setVisible(true)}
                 handleClose={() => setVisible(false)}
                 trigger={
-                  <View className="h-10 bg-tertiary flex-row justify-center items-center w-20 px-2 py-1 rounded-3xl">
-                    <CountryFlag isoCode={flagMap[targetLang]} size={20} />
-                    {/* Eğer istersen yanına targetLang de gösterebilirsin */}
-                    {/* <Text className="ml-2 text-black font-semibold">{targetLang}</Text> */}
-                  </View>
-                }
-                
+  <View className="h-10 bg-tertiary flex-row justify-center items-center w-20 px-2 py-1 rounded">
+    <CountryFlag isoCode={flagMap[targetLang]} size={20} />
+    {/* Eğer istersen yanına targetLang de gösterebilirsin */}
+    {/* <Text className="ml-2 text-black font-semibold">{targetLang}</Text> */}
+  </View>
+}
+
               >
                 <MenuOption
   onSelect={() => {

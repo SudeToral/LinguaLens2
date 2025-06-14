@@ -12,7 +12,17 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProfile } from "../../context/ProfileContext";
 import AnimatedSnackbar from "../Components/AnimatedSnackbar";
-import { account, databases } from "../lib/appwriteConfig";
+import { account, databases } from "../lib/appwriteConfig";// ✅ varsa yolunu kontrol et
+
+const [snackbarVisible, setSnackbarVisible] = useState(false);
+const [snackbarText, setSnackbarText] = useState("");
+
+const showSnackbar = (msg: string) => {
+  setSnackbarText(msg);
+  setSnackbarVisible(true);
+  setTimeout(() => setSnackbarVisible(false), 3000); // 3 saniye sonra kapat
+};
+
 
 
 type EditableField = "Username" | "Email" | "Interests" | "Password";

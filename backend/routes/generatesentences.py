@@ -63,6 +63,7 @@ def generate_personalized_sentences(
 @router.post("/generate-sentences", response_model=GenerateResponse)
 async def generate_sentences(req: GenerateRequest):
     try:
+        print("Generating sentences for interests:", req.interest)
         sentences = generate_personalized_sentences(
             word=req.word,
             interest=req.interest or "",

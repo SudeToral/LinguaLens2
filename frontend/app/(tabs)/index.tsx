@@ -15,13 +15,8 @@ import { translateWord } from "../services/translationService";
 import { generateSentences } from "../services/sentenceService";
 import DeckModal from "../Components/DeckModal";
 import { targetLanguage } from "./_layout";
-<<<<<<< HEAD
 import { Query } from "react-native-appwrite";
-
-
-=======
 import AnimatedSnackbar from "../Components/AnimatedSnackbar";
->>>>>>> duygu-backup2
 
 export default function Index() {
   const [userId, setUserId] = useState<string>("");

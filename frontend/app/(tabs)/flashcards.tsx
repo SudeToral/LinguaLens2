@@ -273,8 +273,8 @@ export const FlashCards = () => {
                 className="flex-row items-center justify-between bg-white p-4 mb-2 rounded-lg shadow"
               >
                 <View>
-                  <Text className="text-base font-semibold">Front: {card.front}</Text>
-                  <Text className="text-sm text-gray-600">Back: {card.back}</Text>
+                  <Text className="text-base font-semibold">Target Word: {card.front}</Text>
+                  <Text className="text-sm text-gray-600">Base Word: {card.back}</Text>
                 </View>
                 <Pressable onPress={() => { 
                   Alert.alert(
@@ -287,7 +287,7 @@ export const FlashCards = () => {
                   );
                   
                  }}>
-                  <MaterialCommunityIcons name="trash-can-outline" size={24} color="red" />
+                  <MaterialCommunityIcons name="trash-can-outline" size={24} color="#2D4F2B" />
                 </Pressable>
               </View>
             ))}

@@ -75,14 +75,15 @@ const styles = StyleSheet.create({
     menu: {
       position: 'absolute',
       width: 80,
-      backgroundColor: 'white',
-      borderRadius: 5,
+      backgroundColor: '#FFF1CA',
+      borderRadius: 15,
       padding: 10,
       shadowColor: '#000',
       shadowOffset: {width: 0, height: 2},
       shadowOpacity: 0.2,
       shadowRadius: 4,
       elevation: 4,
+     
     },
     menuOption: {
       padding: 5,

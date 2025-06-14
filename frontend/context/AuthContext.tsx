@@ -6,6 +6,7 @@ import React, {
     useState,
 } from "react";
 import { account } from "../app/lib/appwriteConfig";
+
   
   // User type based on Appwrite's response
   type User = {

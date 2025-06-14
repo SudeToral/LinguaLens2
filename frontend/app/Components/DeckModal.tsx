@@ -73,7 +73,7 @@ const DeckModal = ({
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View className="flex-1 bg-black/50 justify-center p-4">
-        <View className="bg-white rounded-3xl p-6 border-4 border-support">
+        <View className="bg-primary rounded-3xl p-6 border-4 border-support">
           <Text className="text-xl font-bold mb-4 text-center">
             Available Decks
           </Text>
@@ -92,7 +92,7 @@ const DeckModal = ({
                   <MaterialCommunityIcons
                     name="card-multiple"
                     size={120}
-                    color="#81C784"
+                    color="#FFB823"
                   />
                   <Text className="text-black mt-2 text-center font-bold">
                     {deck.name}
@@ -108,7 +108,8 @@ const DeckModal = ({
                 <MaterialCommunityIcons
                   name="card-plus"
                   size={120}
-                  color="#81C784"
+                  color="#FFB823"
+                
                 />
                 <Text className="text-black mt-2 text-center font-bold">
                   Add Deck
@@ -125,7 +126,7 @@ const DeckModal = ({
                   onChangeText={setNewDeckName}
                 />
                 <TouchableOpacity
-                  className="bg-support py-3 mt-2 rounded-xl items-center"
+                  className="bg-tertiary py-3 mt-2 rounded-xl items-center"
                   onPress={addDeck}
                 >
                   <Text className="text-black font-bold">Create Deck</Text>
@@ -137,7 +138,7 @@ const DeckModal = ({
           <View className="items-center mt-6">
             <TouchableOpacity
               onPress={onClose}
-              className="bg-gray-300 px-6 py-3 rounded-lg"
+              className="bg-secondary px-6 py-3 rounded-lg"
             >
               <Text className="text-black font-bold">Close</Text>
             </TouchableOpacity>

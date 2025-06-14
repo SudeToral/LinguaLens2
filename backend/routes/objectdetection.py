@@ -4,11 +4,40 @@ import io, base64
 from PIL import Image
 import numpy as np
 from ultralytics import YOLO
+import os
+import openai
 
-router = APIRouter()
+router=APIRouter()
 
-# Load your YOLOv11-n model (replace with your actual weights path)
-model = YOLO('yolo11n.pt')
+
+CLASSES = [
+    # COCO CLASSES
+    "person","key","keychain", "duster" ,"bicycle", "car", "motorcycle",  "bus", "train", "truck", "boat",
+    "traffic light", "stop sign", "bench", "bird", "cat",
+    "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack",
+     "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball",
+    "kite", "skateboard", "surfboard", "tennis racket",
+    "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
+    "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair",
+    "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote",
+    "keyboard", "cell phone","phone","smart phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book",
+    "clock", "vase", "scissors",
+
+    # LINGUALENS VOCABULARY
+    "notebook", "pen", "bottle","pencil","ballpoint pen", "ink pen", "marker", "writing tool", "eraser", "ruler", "crayon", "whiteboard", "blackboard",
+    "chalk", "marker", "glue stick", "highlighter", "desk", "folder", "calendar", "lamp",
+    "window", "door", "fan", "light switch", "mirror", "plant", "water bottle", "bag", "wallet",
+    "phone charger", "headphones", "earbuds", "key", "shoe", "sock", "hat", "jacket", "glasses",
+    "umbrella", "watch", "mask", "plate", "napkin", "cupboard", "mug", "pan", "pot", "frying pan",
+    "spatula", "vacuum", "soap", "towel", "shampoo", 
+     "lego", "blocks", "doll", "ball", "guitar", "piano", "drum", "microphone",
+    "camera", "tripod", "paintbrush", "easel", "globe", "map", "flag", "coin", "money", 
+    "id card", "passport", "keyboard", "monitor", "charger", "mouse pad", "usb stick", "flash drive"
+]
+
+# ✅ YOLOv8s-World modeli yükleniyor
+model = YOLO("yolov8s-world.pt")
+model.set_classes(CLASSES)
 
 class DetectOutput(BaseModel):
     image: str  # base64-encoded cropped region

@@ -33,7 +33,7 @@ export default function TabsLayout() {
   const [visible, setVisible] = useState(false);
   const { targetLang, setTargetLang } = targetLanguage();
   const flagMap: { [key: string]: string } = {
-    English: "US",
+    German: "DE",
     Turkish: "TR",
     Spanish: "ES",
   };
@@ -109,13 +109,13 @@ export default function TabsLayout() {
 
     <MenuOption
       onSelect={() => {
-        setTargetLang("English");
+        setTargetLang("German");
         setVisible(false);
       }}
     >
       <View className="flex-row items-center space-x-2">
-        <CountryFlag isoCode="US" size={25} />
-        <Text>English</Text>
+        <CountryFlag isoCode="DE" size={25} />
+        <Text>German</Text>
       </View>
     </MenuOption>
 

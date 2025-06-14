@@ -14,6 +14,7 @@ import { useProfile } from "../../context/ProfileContext";
 import AnimatedSnackbar from "../Components/AnimatedSnackbar";
 import { account, databases } from "../lib/appwriteConfig";
 
+
 type EditableField = "Username" | "Email" | "Interests" | "Password";
 
 const DATABASE_ID = "682b8dc8002b735ece29";

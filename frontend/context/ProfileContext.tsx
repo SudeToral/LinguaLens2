@@ -16,8 +16,8 @@ type ProfileContextType = {
 
 // Provide default values
 const defaultProfile: Profile = {
-  Username: "john_doe",
-  Email: "john@example.com",
+  Username: "",
+  Email: "",
   password: "",
   Interests: "",
 };

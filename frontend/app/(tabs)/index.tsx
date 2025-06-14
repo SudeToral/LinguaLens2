@@ -11,12 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { account } from "../lib/appwriteConfig";
+import { account, databases } from "../lib/appwriteConfig";
 import { getBaseWord, uploadFlashcard } from "../services/photoService";
 import { translateWord } from "../services/translationService";
 import { generateSentences } from "../services/sentenceService";
 import DeckModal from "../Components/DeckModal";
 import { targetLanguage } from "./_layout";
+import { Query } from "react-native-appwrite";
 
 
 
@@ -44,19 +45,36 @@ export default function Index() {
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
   const squareSize = screenHeight * 0.4;
+  
+  const databaseId = "682b8dc8002b735ece29";
+  const user_profile_collectionId = "682b8dfc0011b9c6a991";
+
+   async function getUserInterests(): Promise<string> {
+    try {
+      const user = await account.get();
+      const response = await databases.getDocument(databaseId, user_profile_collectionId, user.$id);
+      return response?.interests ?? "";
+    } catch (error) {
+      console.error("Failed to fetch user interests:", error);
+      return "";
+    }
+  }
 
   const toggleCameraFacing = () =>
     setFacing((f) => (f === "back" ? "front" : "back"));
 
   const handleSentences = async (): Promise<string[]> => {
+    const interests = await getUserInterests();
     if (!translatedWord) {
       console.log("No translated word!");
       return [];
     }
     try {
+      // Fetch interests from db
+
       const result = await generateSentences({
         word: translatedWord,
-        interest: "",
+        interest: interests,
         count: 3,
         language: targetLang,
         level: "A2-B1",

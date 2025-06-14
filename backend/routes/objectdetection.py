@@ -7,6 +7,7 @@ from ultralytics import YOLO
 import os
 import openai
 
+router=APIRouter()
 
 
 CLASSES = [

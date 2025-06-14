@@ -6,6 +6,8 @@ import { ProfileProvider } from "../../context/ProfileContext";
 import { DropdownMenu } from "../Components/DropDownMenu";
 import { MenuOption } from "../Components/MenuOption";
 import { create } from 'zustand';
+import CountryFlag from "react-native-country-flag";
+
 
 interface StoreState {
   targetLang: string;
@@ -30,6 +32,12 @@ export function SettingsButton() {
 export default function TabsLayout() {
   const [visible, setVisible] = useState(false);
   const { targetLang, setTargetLang } = targetLanguage();
+  const flagMap: { [key: string]: string } = {
+    English: "US",
+    Turkish: "TR",
+    Spanish: "ES",
+  };
+  
 
   return (
     <ProfileProvider>
@@ -66,35 +74,51 @@ export default function TabsLayout() {
                 handleOpen={() => setVisible(true)}
                 handleClose={() => setVisible(false)}
                 trigger={
-                  <View className="h-10 bg-white flex-row justify-center items-center w-20 px-2 py-1 rounded">
-                    <Text className="font-semibold text-black font-playpen">{targetLang}</Text>
+                  <View className="h-10 bg-tertiary flex-row justify-center items-center w-20 px-2 py-1 rounded-3xl">
+                    <CountryFlag isoCode={flagMap[targetLang]} size={20} />
+                    {/* Eğer istersen yanına targetLang de gösterebilirsin */}
+                    {/* <Text className="ml-2 text-black font-semibold">{targetLang}</Text> */}
                   </View>
                 }
+                
               >
                 <MenuOption
-                  onSelect={() => {
-                    setTargetLang("spanish");
-                    setVisible(false);
-                  }}
-                >
-                  <Text>spanish</Text>
-                </MenuOption>
-                <MenuOption
-                  onSelect={() => {
-                    setTargetLang("turkish");
-                    setVisible(false);
-                  }}
-                >
-                  <Text>turkish</Text>
-                </MenuOption>
-                <MenuOption
-                  onSelect={() => {
-                    setTargetLang("english");
-                    setVisible(false);
-                  }}
-                >
-                  <Text>english</Text>
-                </MenuOption>
+  onSelect={() => {
+    setTargetLang("Spanish");
+    setVisible(false);
+  }}
+>
+  <View className="flex-row items-center space-x-2 rounded-3xl">
+    <CountryFlag isoCode="ES" size={25} />
+    <Text>Spanish</Text>
+  </View>
+    </MenuOption>
+
+    <MenuOption
+      onSelect={() => {
+      
+        setTargetLang("Turkish");
+        setVisible(false);
+      }}
+    >
+      <View className="flex-row items-center space-x-2">
+        <CountryFlag isoCode="TR" size={25} />
+        <Text>Turkish</Text>
+      </View>
+    </MenuOption>
+
+    <MenuOption
+      onSelect={() => {
+        setTargetLang("English");
+        setVisible(false);
+      }}
+    >
+      <View className="flex-row items-center space-x-2">
+        <CountryFlag isoCode="US" size={25} />
+        <Text>English</Text>
+      </View>
+    </MenuOption>
+
               </DropdownMenu>
             </View>
           ),

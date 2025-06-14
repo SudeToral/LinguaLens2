@@ -16,6 +16,8 @@ import { useEffect, useRef, useState } from "react";
 import { fetchDecks } from "../services/flashcardService";
 import { account, databases } from "../lib/appwriteConfig";
 import { Query } from "react-native-appwrite";
+import { RefreshControl } from "react-native";
+
 
 const databaseId = "682b8dc8002b735ece29";
 const deckCollectionId = "684c70e40038eb434002";
@@ -59,6 +61,22 @@ export const FlashCards = () => {
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedFlashcards, setSelectedFlashcards] = useState<{ id: string; front: string; back: string }[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDecksFromServer = async () => {
+    try {
+      const user = await account.get();
+      if (!user) {
+        console.error("User not found. Please log in.");
+        return;
+      }
+      const fetchedDecks = await fetchDecks(user.$id);
+      setDecks(fetchedDecks.map((deckName) => ({ name: deckName })));
+    } catch (error) {
+      console.error("Error fetching decks:", error);
+    }
+  };
+  
 
   const handleEditDeck = async () => {
     if (!selectedDeck) return;
@@ -142,22 +160,15 @@ export const FlashCards = () => {
   const deckRefs = useRef<{ [key: string]: any }>({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      const user = await account.get();
-      if (!user) {
-        console.error("User not found. Please log in.");
-        return;
-      }
-      try {
-        const fetchedDecks = await fetchDecks(user.$id);
-        setDecks(fetchedDecks.map((deckName) => ({ name: deckName })));
-      } catch (error) {
-        console.error("Error fetching decks:", error);
-      }
-    };
-
-    fetchData();
+    fetchDecksFromServer();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchDecksFromServer();
+    setRefreshing(false);
+  };
+  
 
   const handleLongPress = (deckName: string) => {
     const ref = deckRefs.current[deckName];
@@ -201,7 +212,10 @@ export const FlashCards = () => {
 
   return (
     <SafeAreaView className="bg-primary flex-1 px-4 pt-4">
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         <View className="flex-row flex-wrap justify-between">
           {decks.map((deck) => (
             <DeckButton

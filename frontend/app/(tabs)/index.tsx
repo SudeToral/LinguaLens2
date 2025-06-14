@@ -1,9 +1,7 @@
-
 import { Entypo } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import React, { useRef, useState, useEffect } from "react";
 import {
-  Button,
   Dimensions,
   Image,
   Modal,
@@ -17,8 +15,7 @@ import { translateWord } from "../services/translationService";
 import { generateSentences } from "../services/sentenceService";
 import DeckModal from "../Components/DeckModal";
 import { targetLanguage } from "./_layout";
-
-
+import AnimatedSnackbar from "../Components/AnimatedSnackbar";
 
 export default function Index() {
   const [userId, setUserId] = useState<string>("");
@@ -30,6 +27,14 @@ export default function Index() {
       .catch((err) => console.error("Cannot fetch user:", err));
   }, []);
 
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarText, setSnackbarText] = useState("");
+
+  const showSnackbar = (msg: string) => {
+    setSnackbarText(msg);
+    setSnackbarVisible(true);
+  };
+
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
@@ -40,7 +45,7 @@ export default function Index() {
   const [baseWord, setBaseWord] = useState("");
   const [translatedWord, setTranslatedWord] = useState("");
   const [sentences, setSentences] = useState(Array<string>);
-  const {targetLang, setTargetLang} = targetLanguage();
+  const { targetLang } = targetLanguage();
   const screenWidth = Dimensions.get("window").width;
   const screenHeight = Dimensions.get("window").height;
   const squareSize = screenHeight * 0.4;
@@ -61,58 +66,56 @@ export default function Index() {
         language: targetLang,
         level: "A2-B1",
       });
-      setSentences(result);    // still update state for display
-      return result;           // <-- return the fresh array
+      setSentences(result);
+      return result;
     } catch (err) {
       console.error("Error generating sentences:", err);
       return [];
     }
   };
-  const [selectedDeck, setSelectedDeck] = useState("");
-  const selectDeck = async (deckName: string) => {
 
+  const selectDeck = async (deckName: string) => {
     const fresh = await handleSentences();
     const combined = fresh.join(" ");
-    console.log("Combined: ", combined);
-    deckName = deckName.trim()
+    deckName = deckName.trim();
+
     if (capturedUri) {
       await handleSaveFlashcard(
         baseWord,
         translatedWord,
         combined,
         capturedUri,
-        deckName,
+        deckName
       );
+      showSnackbar(`Flashcard added to "${deckName}" deck!`);
     } else {
       console.warn("Captured URI is null—cannot save flashcard");
     }
-  }
-
-  
+  };
 
   const grabPicture = async () => {
     if (!cameraRef.current) return;
-  
+
     const photo = await cameraRef.current.takePictureAsync({
       skipProcessing: true,
     });
-  
+
     setCapturedUri(photo.uri);
-    setBaseWord("");          // Clear previous state
-    setTranslatedWord("");    // Clear previous state
-    setSentences([]);         // Clear previous state
-    setModalVisible(true);    // <-- Show modal immediately
-  
+    setBaseWord("");
+    setTranslatedWord("");
+    setSentences([]);
+    setModalVisible(true);
+
     try {
       const { baseWord: freshBase } = await getBaseWord(photo.uri);
       setBaseWord(freshBase);
-  
+
       const t = await translateWord(freshBase, targetLang);
       setTranslatedWord(t);
     } catch (err) {
       console.error("Error processing image:", err);
     }
-  };  
+  };
 
   const handleSaveFlashcard = async (
     baseWord: string,
@@ -143,7 +146,7 @@ export default function Index() {
   if (!permission) return null;
   if (!permission.granted) {
     return (
-      <View className="flex-1 bg-primary ndary justify-center items-center p-4">
+      <View className="flex-1 bg-primary justify-center items-center p-4">
         <Text className="mb-4 text-gray-700 text-center">
           Grant camera permission to continue
         </Text>
@@ -159,41 +162,60 @@ export default function Index() {
 
   return (
     <View className="flex-1 bg-primary items-center justify-center">
-      {/* Camera Preview */}
-
       <View
-        className=" border-solid border-secondary overflow-hidden"
-        style={{ width: squareSize, height: squareSize, borderRadius: 48, borderWidth: 12 ,
+        className="border-solid border-secondary overflow-hidden"
+        style={{
+          width: squareSize,
+          height: squareSize,
+          borderRadius: 48,
+          borderWidth: 12,
           transform: [
-            { translateX: (screenWidth ) / 2 - (squareSize / 2 ) - (screenWidth*0.05)},
-            { translateY: (screenHeight ) / 4 - (squareSize / 2 ) - (screenHeight*0.05) },
-          ]
+            {
+              translateX:
+                screenWidth / 2 - squareSize / 2 - screenWidth * 0.05,
+            },
+            {
+              translateY:
+                screenHeight / 4 - squareSize / 2 - screenHeight * 0.05,
+            },
+          ],
         }}
       >
-        <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} className="rounded-3xl z-200"/>
-        </View>
-        <Image className="justify-center"
-      source={require("../../assets/images/cat-peek.png")}
-      style={{
-        position: "absolute",
+        <CameraView
+          ref={cameraRef}
+          style={{ flex: 1 }}
+          facing={facing}
+          className="rounded-3xl z-200"
+        />
+      </View>
 
-        transform: [
-          { translateX: (screenWidth ) / 2 - (squareSize / 2 ) - (screenWidth*0.05)},
-          { translateY: (screenHeight ) / 4 - (squareSize / 2 ) - (screenHeight*0.14) },
-        ],
-        width: squareSize*1.5,
-        height: squareSize*1.5,
-        resizeMode: "contain",
-      }}
-    />
+      <Image
+        className="justify-center"
+        source={require("../../assets/images/cat-peek.png")}
+        style={{
+          position: "absolute",
+          transform: [
+            {
+              translateX:
+                screenWidth / 2 - squareSize / 2 - screenWidth * 0.05,
+            },
+            {
+              translateY:
+                screenHeight / 4 - squareSize / 2 - screenHeight * 0.14,
+            },
+          ],
+          width: squareSize * 1.5,
+          height: squareSize * 1.5,
+          resizeMode: "contain",
+        }}
+      />
 
-
-      {/* Flip & Capture Buttons */}
       <View className="flex-row items-center justify-center mt-5 w-full relative">
         <TouchableOpacity
           onPress={grabPicture}
-          className="bg-secondary p-2 rounded-full">
-            <Entypo name="circle" size={60} color="#FFB823" className="border-2 rounded-full"/>
+          className="bg-secondary p-2 rounded-full"
+        >
+          <Entypo name="circle" size={60} color="#FFB823" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={toggleCameraFacing}
@@ -203,7 +225,6 @@ export default function Index() {
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
       <Modal
         transparent
         visible={isModalVisible}
@@ -227,29 +248,40 @@ export default function Index() {
             <View className="flex-row justify-between">
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
-                className="bg-secondary px-6 py-3 rounded-3xl justify-center">
-                  <Text className="text-xl font-semibold">Cancel</Text>
+                className="bg-secondary px-6 py-3 rounded-3xl justify-center"
+              >
+                <Text className="text-xl font-semibold">Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
                   setModalVisible(false);
                   setAreDecksVisibe(true);
                 }}
-                className="bg-tertiary px-8 py-3 rounded-3xl justify-center">
-                  <Text className="text-xl font-semibold">Save</Text>
+                className="bg-tertiary px-8 py-3 rounded-3xl justify-center"
+              >
+                <Text className="text-xl font-semibold">Save</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Flashcard Modal */}
-      <DeckModal visible={areDecksVisibe}
+      <DeckModal
+        visible={areDecksVisibe}
         onClose={() => setAreDecksVisibe(false)}
-        onSelectDeck={(deckName) => { setAreDecksVisibe(false); 
-        selectDeck(deckName);
-        console.log(`Selected deck: ${deckName}`);
-  }} />
+        onSelectDeck={(deckName) => {
+          setAreDecksVisibe(false);
+          selectDeck(deckName);
+          console.log(`Selected deck: ${deckName}`);
+        }}
+      />
+
+      {/* ✅ Snackbar Component */}
+      <AnimatedSnackbar
+        message={snackbarText}
+        visible={snackbarVisible}
+        onClose={() => setSnackbarVisible(false)}
+      />
     </View>
   );
 }

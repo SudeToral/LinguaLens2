@@ -138,7 +138,7 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-primary">
-      <View className="p-5  border-gray-300 bg-support">
+      <View className="p-5  border-gray-300 bg-tertiary">
         <Text className="text-2xl font-bold text-black">{profile.Username}</Text>
       </View>
 
@@ -159,9 +159,7 @@ const Profile = () => {
                 <Text className="text-base text-gray-600">{field}</Text>
                 <Text className="text-base text-black">{val}</Text>
               </View>
-              {field === "Interests" && (
-                <Text className="text-[#64B5F6] font-semibold">Edit</Text>
-              )}
+              
             </TouchableOpacity>
           );
         })}
@@ -169,7 +167,7 @@ const Profile = () => {
 
       <View className="px-5 mb-20">
         <TouchableOpacity
-          className="bg-tertiary py-3 rounded-2xl items-center"
+          className="bg-secondary py-3 rounded-2xl items-center"
           onPress={async () => {
             await signout();
             router.replace("/signin");
@@ -181,7 +179,7 @@ const Profile = () => {
 
       <Modal transparent animationType="slide" visible={!!editingField}>
         <View className="flex-1 justify-center items-center bg-black/50">
-          <View className="bg-white w-11/12 p-5 rounded-2xl">
+          <View className="bg-primary w-11/12 p-5 rounded-2xl">
             <Text className="text-lg font-semibold mb-4 text-black">
               {editingField === "Password" ? "Change Password" : `Change ${editingField}`}
             </Text>
@@ -189,21 +187,21 @@ const Profile = () => {
             {editingField === "Password" ? (
               <>
                 <TextInput
-                  className="border border-gray-300 p-3 rounded-lg mb-3 text-black"
+                  className="border border-gray-400 p-3 rounded-lg mb-3 text-black"
                   placeholder="Old Password"
                   secureTextEntry
                   value={oldPass}
                   onChangeText={setOldPass}
                 />
                 <TextInput
-                  className="border border-gray-300 p-3 rounded-lg mb-3 text-black"
+                  className="border border-gray-400 p-3 rounded-lg mb-3 text-black"
                   placeholder="New Password"
                   secureTextEntry
                   value={newPass}
                   onChangeText={setNewPass}
                 />
                 <TextInput
-                  className="border border-gray-300 p-3 rounded-lg mb-6 text-black"
+                  className="border border-gray-400 p-3 rounded-lg mb-6 text-black"
                   placeholder="Confirm Password"
                   secureTextEntry
                   value={confirmPass}
@@ -213,7 +211,7 @@ const Profile = () => {
             ) : (
               <>
                 <TextInput
-                  className="border border-gray-300 p-3 rounded-lg mb-3 text-black"
+                  className="border border-gray-400 p-3 rounded-lg mb-3 text-black"
                   placeholder={editingField ?? ""}
                   value={inputValue}
                   onChangeText={setInputValue}
@@ -225,7 +223,7 @@ const Profile = () => {
                       To update your email, please enter your current password.
                     </Text>
                     <TextInput
-                      className="border border-gray-300 p-3 rounded-lg mb-6 text-black"
+                      className="border border-gray-400 p-3 rounded-lg mb-6 text-black"
                       placeholder="Current Password"
                       secureTextEntry
                       value={oldPass}
@@ -243,7 +241,7 @@ const Profile = () => {
               <Pressable
                 onPress={editingField === "Password" ? savePassword : saveGeneric}
               >
-                <Text className="text-[#64B5F6] font-semibold">Save</Text>
+                <Text className="text-tertiary font-semibold">Save</Text>
               </Pressable>
             </View>
           </View>

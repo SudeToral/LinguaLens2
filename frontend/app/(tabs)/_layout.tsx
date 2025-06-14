@@ -1,4 +1,3 @@
-// app/(tabs)/_layout.tsx
 
 import { MaterialIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, Tabs } from "expo-router";
@@ -34,7 +33,7 @@ export default function TabsLayout() {
             alignItems: "center",
           },
           tabBarStyle: {
-            backgroundColor: "#64B5F6", // Background for navbar
+            backgroundColor: "#708A58", // Background for navbar
             height: 100,
             position: "absolute",
             borderWidth: 0,
@@ -42,7 +41,7 @@ export default function TabsLayout() {
             overflow: "hidden",
           },
           headerStyle: {
-            backgroundColor: "#64B5F6",
+            backgroundColor: "#708A58",
           },
           tabBarIconStyle: {
             justifyContent: "center",

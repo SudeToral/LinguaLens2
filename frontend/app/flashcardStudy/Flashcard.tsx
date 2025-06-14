@@ -19,15 +19,15 @@ const FlashCard = ({ frontText, frontImageUri, backText, backSentences, goodFunc
     }, [frontText, frontImageUri, backText, backSentences]);
   return (
     !flipped ? (
-    <Pressable onPress={() => setFlipped(!flipped)} className="w-11/12 h-4/6 rounded-3xl bg-support p-4">
+    <Pressable onPress={() => setFlipped(!flipped)} className="w-11/12 h-4/6 rounded-3xl bg-light-100 p-4">
         <View className="items-center flex-1">
-            <Image source={{ uri: frontImageUri }} className="w-full h-3/4 rounded-lg mb-4" resizeMode="contain" />
+            <Image source={{ uri: frontImageUri }} className="w-full h-3/4 rounded-3xl mb-4" resizeMode="contain" />
             <Text className="text-black text-center text-4xl font-bold">{frontText}</Text>
         </View>
     </Pressable>
     ) : (
     <>
-    <View className="w-11/12 h-4/6 rounded-3xl bg-support p-4">
+    <View className="w-11/12 h-4/6 rounded-3xl bg-light-100 p-4">
         <View className="items-center flex-1">
             {/* backImageUri && (
             <Image source={{ uri: backImageUri }} className="w-full h-3/4 rounded-lg mb-4" resizeMode="contain" />

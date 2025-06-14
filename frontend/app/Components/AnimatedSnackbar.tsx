@@ -38,7 +38,7 @@ const AnimatedSnackbar = ({
 
   return (
     <Animated.View
-      className="absolute bottom-40 self-center bg-blue-400 px-6 py-3 rounded-lg shadow-lg z-100 max-w-[90%]"
+      className="absolute bottom-40 self-center bg-secondary px-6 py-3 rounded-lg shadow-lg z-100 max-w-[90%]"
       style={{
         transform: [{ translateY: slideAnim }], // ✅ doğru kullanım bu
       }}

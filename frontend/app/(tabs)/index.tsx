@@ -1,3 +1,4 @@
+
 import { Entypo } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import React, { useRef, useState, useEffect } from "react";
@@ -69,7 +70,7 @@ export default function Index() {
     const fresh = await handleSentences();
     const combined = fresh.join(" ");
     console.log("Combined: ", combined);
-    deckName = deckName.trim();
+    deckName = deckName.trim()
     if (capturedUri) {
       await handleSaveFlashcard(
         baseWord,
@@ -156,7 +157,7 @@ export default function Index() {
     <View className="flex-1 bg-primary items-center justify-center">
       {/* Camera Preview */}
       <View
-        className=" border-solid border-tertiary overflow-hidden"
+        className=" border-solid border-secondary overflow-hidden"
         style={{ width: squareSize, height: squareSize, borderRadius: 48, borderWidth: 12}}
       >
         <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing} className="roundedn-3xl"/>
@@ -166,12 +167,12 @@ export default function Index() {
       <View className="flex-row items-center justify-center mt-5 w-full relative">
         <TouchableOpacity
           onPress={grabPicture}
-          className="bg-tertiary p-2 rounded-full">
-            <Entypo name="circle" size={60} color="#81C784" className="border-2 rounded-full"/>
+          className="bg-secondary p-2 rounded-full">
+            <Entypo name="circle" size={60} color="#FFB823" className="border-2 rounded-full"/>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={toggleCameraFacing}
-          className="absolute right-10 bg-tertiary p-2 rounded-full"
+          className="absolute right-10 bg-secondary p-2 rounded-full"
         >
           <Entypo name="cycle" size={24} color="black" />
         </TouchableOpacity>
@@ -185,7 +186,7 @@ export default function Index() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View className="flex-1 bg-black/50 justify-center p-4">
-          <View className="bg-white rounded-3xl p-6 border-4 border-support">
+          <View className="bg-primary rounded-3xl p-6 border-4 border-support">
             {capturedUri && (
               <Image
                 source={{ uri: capturedUri }}

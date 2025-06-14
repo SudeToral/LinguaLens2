@@ -35,7 +35,7 @@ const SignIn: React.FC = () => {
   if (session) return <Redirect href="/" />;
 
   return (
-    <View className="flex-1 justify-center px-6 bg-white">
+    <View className="flex-1 justify-center px-6 bg-primary">
       <View className="w-full">
         <Text className="text-center text-3xl font-bold italic text-black mb-10">
           Sign In
@@ -44,7 +44,7 @@ const SignIn: React.FC = () => {
         <Text className="text-base text-gray-800">Email:</Text>
         <TextInput
           placeholder="Enter your email."
-          className="border border-gray-300 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
+          className="border border-gray-400 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -54,14 +54,14 @@ const SignIn: React.FC = () => {
         <Text className="text-base text-gray-800">Password:</Text>
         <TextInput
           placeholder="Enter your password."
-          className="border border-gray-300 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
+          className="border border-gray-400 rounded-lg px-4 py-2 mt-2 mb-4 text-black"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
 
         <TouchableOpacity
-          className="bg-purple-100 py-3 rounded-lg items-center mt-2"
+          className="bg-tertiary py-3 rounded-lg items-center mt-2"
           onPress={handleSubmit}
         >
           <Text className="text-black text-lg font-semibold">Login</Text>

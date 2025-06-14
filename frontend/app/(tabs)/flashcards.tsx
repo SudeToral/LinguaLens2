@@ -14,7 +14,7 @@ const DeckButton = ({ name }: { name: string }) => {
       onPress={() => router.push(`/flashcardStudy/${name}`)}
       className="w-[45%] m-1 items-center"
     >
-      <MaterialCommunityIcons name="card-multiple" size={120} color="#81C784" />
+      <MaterialCommunityIcons name="card-multiple" size={120} color="#FFB823" />
       <Text className="text-black mt-2 text-center font-bold">{name}</Text>
     </Pressable>
   );
